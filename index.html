@@ -248,6 +248,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <script>
 let pts=340,currentMode='staff',currentBranch=null,branchStep=0;
+const awardedSteps=new Set();
 
 const levels=[
   {min:0,max:200,name:'Fired Up'},
@@ -296,15 +297,34 @@ const branches={
   ],
 
   serf:[
-    {bot:`<span class="ml">S.E.R.F.</span><br><b>Our way of working.</b><br><br>A simple framework we use in every SME conversation to help customers Kyusa Level.`},
-    {bot:`<div class="serf-grid"><div class="serf-box"><div class="serf-letter">S</div><div class="serf-word">Spot</div><div class="serf-desc">We spot the need behind the transaction — stock, cash flow, suppliers, bigger orders, expansion.</div></div><div class="serf-box"><div class="serf-letter">E</div><div class="serf-word">Engage</div><div class="serf-desc">We ask: "What move are you trying to make next?"</div></div><div class="serf-box"><div class="serf-letter">R</div><div class="serf-word">Recommend</div><div class="serf-desc">We match the right Maali solution to the move.</div></div><div class="serf-box"><div class="serf-letter">F</div><div class="serf-word">Follow Up</div><div class="serf-desc">We close the loop — capture, connect, check back, help them act.</div></div></div>`,earn:{pts:15,msg:'+15 pts — S.E.R.F. learned!'}},
-    {bot:`<div class="ic"><div class="it">When we S.E.R.F. well...</div><div class="ib">More useful conversations. More Maali sign-ups. More of our customers moving forward. That's the win.</div></div>`,qr:['Customer Obsession quiz','Maali by business need','Back to menu']}
+    {bot:`<span class="ml">S.E.R.F.</span><br><b>The New dfcu Way of Working.</b><br><br>A practical behaviour framework for helping customers Kyusa Level — let's run through it!`},
+    {bot:`<div class="serf-grid"><div class="serf-box"><div class="serf-letter">S</div><div class="serf-word">Spot</div><div class="serf-desc">The need behind the transaction. Look for: stock, payments, cash flow, suppliers, orders, expansion.</div></div><div class="serf-box"><div class="serf-letter">E</div><div class="serf-word">Engage</div><div class="serf-desc">Ask about their next move. e.g. "What move is your business trying to make next?"</div></div><div class="serf-box"><div class="serf-letter">R</div><div class="serf-word">Recommend</div><div class="serf-desc">The right Maali solution — Current Account, Maali Plus, or Maali Bundled.</div></div><div class="serf-box"><div class="serf-letter">F</div><div class="serf-word">Follow Up</div><div class="serf-desc">Capture the lead, connect the team, check back, help them act.</div></div></div>`,earn:{pts:15,msg:'+15 pts — S.E.R.F. learned!'}},
+    {bot:`<div class="ic"><div class="it">The outcome — what Kyusa Level looks like</div><div class="ib">When we do this well, SMEs move forward & progress.<br><br>More useful conversations. More Maali sign-ups. More customers moving forward. That's the win!</div></div>`,qr:['Try a SPOT challenge','Maali by business need','Back to menu']}
+  ],
+
+  serfChallenge:[
+    {bot:`<span class="ml">SPOT Challenge 🔥</span><br>Quick one! A customer walks in to pay a supplier — and mentions they've just won a tender to supply 3 schools. What's the business need we should SPOT?`,qr:['They need a bigger loan immediately','Expansion — they may need stock & cash flow support','Nothing, just process the payment','They want to close the account']},
+    {user:'Expansion — they may need stock & cash flow support',bot:`Exactly right! 🎯 <b>+15 pts.</b> That's a classic expansion signal — our cue to Engage and Recommend.<br><br>Ready to put it all together?`,earn:{pts:15,msg:'+15 pts — great SPOT!'},qr:['Customer Obsession quiz','Maali by business need','Back to menu']}
   ],
 
   maaliNeed:[
-    {bot:`<span class="ml">Maali by business need</span><br><b>dfcu Maali</b> is our first proof point of Kyusa Level — one solution, built around where our customer is right now.`},
-    {bot:`<div class="seg-col"><div class="seg-box"><div class="seg-title">Starting out — Micro / Builders</div><div class="seg-role">We're their Reliable Partner</div><div class="seg-desc">Maali Current Account: formalise, manage cash flow, build confidence.</div></div><div class="seg-box"><div class="seg-title">Growing — Small / Dreamers</div><div class="seg-role">We Fuel their Ambition</div><div class="seg-desc">Maali Plus: turn growth plans into practical action.</div></div><div class="seg-box"><div class="seg-title">Scaling — Medium / Climbers</div><div class="seg-role">We're their Competitive Advantage</div><div class="seg-desc">Maali Bundled: operate smarter, grow sustainably.</div></div><div class="seg-box"><div class="seg-title">Established — Large / Anchors</div><div class="seg-role">We're their Proactive Expert</div><div class="seg-desc">Maali Bundled+: scale sustainably, serve their customers better.</div></div></div>`,earn:{pts:10,msg:'+10 pts — Maali map learned!'}},
-    {bot:`<div class="ic"><div class="it">Our Recommend prompt</div><div class="ib">"Which Maali solution helps this customer most — right now?" Not just any product — the right one.</div></div>`,qr:['Customer Obsession quiz','Back to menu']}
+    {bot:`<span class="ml">Maali by business need</span><br>Different customers need different kinds of progress — and we have a role to play for each. Who are we chatting with today?`,qr:['Builders (Micro)','Dreamers (Small)','Climbers (Medium)','Anchors (Large)']}
+  ],
+
+  maaliBuilders:[
+    {bot:`<span class="ml">Builders — Micro <span class="bdg s">Enterprise Tier 3</span></span><br><div class="ic-sky"><div class="it">Customer need: Stability</div><div class="ib">Our role: <b>Reliable Partner</b> for steady growth and stability.<br><br><b>Staff action:</b> Help customers formalise, manage cash flow and build confidence.<br><br><b>Recommend:</b> Maali Current Account.</div></div>`,earn:{pts:10,msg:'+10 pts — Builders segment learned!'},qr:['Try a SPOT challenge','Maali by business need','Back to menu']}
+  ],
+
+  maaliDreamers:[
+    {bot:`<span class="ml">Dreamers — Small <span class="bdg s">Enterprise</span></span><br><div class="ic-sky"><div class="it">Customer need: Expansion of services or location</div><div class="ib">Our role: <b>Fueling Ambition</b> with tools to scale.<br><br><b>Staff action:</b> Help customers turn their ambitions into practical, implementable growth steps.<br><br><b>Recommend:</b> Maali Plus.</div></div>`,earn:{pts:10,msg:'+10 pts — Dreamers segment learned!'},qr:['Try a SPOT challenge','Maali by business need','Back to menu']}
+  ],
+
+  maaliClimbers:[
+    {bot:`<span class="ml">Climbers — Medium <span class="bdg s">Enterprise</span></span><br><div class="ic-sky"><div class="it">Customer need: Recognition & acceptance</div><div class="ib">Our role: <b>Providing Competitive Advantage</b> to maximize efficiency.<br><br><b>Staff action:</b> Help customers operate smarter and grow sustainably.<br><br><b>Recommend:</b> Maali Bundled.</div></div>`,earn:{pts:10,msg:'+10 pts — Climbers segment learned!'},qr:['Try a SPOT challenge','Maali by business need','Back to menu']}
+  ],
+
+  maaliAnchors:[
+    {bot:`<span class="ml">Anchors — Large <span class="bdg s">Commercial & CIB</span></span><br><div class="ic-sky"><div class="it">Customer need: Sustained growth & optimizing finances</div><div class="ib">Our role: <b>Proactive Expert</b> that drives better service delivery.<br><br><b>Staff action:</b> Help customers scale sustainably and deliver better service to the people they serve.<br><br><b>Recommend:</b> Maali Bundled (tailored).</div></div>`,earn:{pts:10,msg:'+10 pts — Anchors segment learned!'},qr:['Try a SPOT challenge','Maali by business need','Back to menu']}
   ],
 
   quiz:[
@@ -315,13 +335,24 @@ const branches={
   ],
 
   leadAcademy:[
-    {bot:`<span class="ml-sky">Leadership Academy</span><br><b>Leading the dfcu Way</b><br><br>These behaviours are how we lead — every day, with every customer. Not posters on a wall — our daily habit.`,earn:{pts:5,msg:'+5 pts — Academy opened!'}},
-    {bot:`<div class="seg-col"><div class="seg-box"><div class="seg-title">We Take Accountability</div><div class="seg-desc">We own the opportunity. We close the loop.</div></div><div class="seg-box"><div class="seg-title">We Work & Play Together</div><div class="seg-desc">One team — branch, product, digital, divisions. We move the customer faster, together.</div></div><div class="seg-box"><div class="seg-title">We Continuously Learn</div><div class="seg-desc">We know Maali. We know our customer's need. We get better with every conversation.</div></div><div class="seg-box"><div class="seg-title">We Deliver Customer Solutions</div><div class="seg-desc">We recommend what truly helps — not just any product.</div></div></div>`,earn:{pts:10,msg:'+10 pts — Leading the dfcu Way mastered!'},qr:['The Employee Pledge','Customer Obsession quiz','Back to menu']}
+    {bot:`<span class="ml-sky">Leadership Academy</span><br><b>Leading the dfcu Way</b><br><br>These don't sit on a poster — they're the 'how' behind everything we do. Two quick reads:`,earn:{pts:5,msg:'+5 pts — Academy opened!'},qr:['Our 4 Behaviours','Our Campaign Pillars']}
+  ],
+
+  leadBehaviours:[
+    {bot:`<span class="ml-sky">Our Behaviours</span><br><div class="seg-col"><div class="seg-box"><div class="seg-title">Take Accountability</div><div class="seg-desc">We deliver on our commitments. Own the customer opportunity. Close the loop.</div></div><div class="seg-box"><div class="seg-title">Work & Play Together</div><div class="seg-desc">One team — branch, product, digital & divisions. We collaborate to move the customer faster.</div></div><div class="seg-box"><div class="seg-title">Continuously Learn</div><div class="seg-desc">We learn to improve our productivity. Know Maali. Understand the need. Improve every conversation.</div></div><div class="seg-box"><div class="seg-title">Shared Goal: Deliver Customer Solutions</div><div class="seg-desc">We recommend the right solution — not just any product — to help the customer progress.</div></div></div>`,earn:{pts:10,msg:'+10 pts — Behaviours mastered!'},qr:['Our Campaign Pillars','The Employee Pledge','Back to menu']}
+  ],
+
+  leadPillars:[
+    {bot:`<span class="ml-sky">Our Campaign Pillars</span><br>Our roles become our content pillars — this is how we show up for every customer:<div class="seg-col" style="margin-top:6px"><div class="seg-box"><div class="seg-title">Be a Reliable Partner</div><div class="seg-desc">Help customers move from uncertainty to stability.</div></div><div class="seg-box"><div class="seg-title">Fuel Ambition</div><div class="seg-desc">Help ambitious businesses turn growth plans into practical action.</div></div><div class="seg-box"><div class="seg-title">Create Competitive Advantage</div><div class="seg-desc">Recommend solutions that help the customer's business work smarter.</div></div><div class="seg-box"><div class="seg-title">Be the Proactive Expert</div><div class="seg-desc">Add value by helping customers scale sustainably and serve their people better.</div></div></div>`,earn:{pts:10,msg:'+10 pts — Pillars mastered!'},qr:['Our 4 Behaviours','The Employee Pledge','Back to menu']}
   ],
 
   pledge:[
-    {bot:`<span class="ml-sky">The Employee Pledge</span><br>Our promise — to each other, and to every customer.`,earn:{pts:10,msg:'+10 pts — pledge taken!'}},
-    {bot:`<div class="ic-pledge"><div class="ib">I help every customer KYUSA LEVEL.<br><br>I spot the move they're trying to make,<br>Engage with purpose,<br>Recommend the right Maali solution,<br>And follow up until they can act.<br><br>I'm a visionary builder, a partner in progress —<br>for our customers and our country.<br><br>Because <b>Kyusa Level starts with me.</b></div></div>`,qr:['Customer Obsession quiz','Back to menu']}
+    {bot:`<span class="ml-sky">The Employee Pledge</span><br>Our promise — to each other, and to every customer. 🎶 Fun fact: it's also a track — inspired by "Nikolela Mali"!`,earn:{pts:10,msg:'+10 pts — pledge taken!'}},
+    {bot:`<div class="ic-pledge"><div class="ib">I help every customer KYUSA LEVEL.<br><br>I spot the move they're trying to make,<br>Engage with purpose,<br>Recommend the right Maali solution,<br>And follow up until they can act.<br><br>I'm a visionary builder, a partner in progress —<br>for our customers and our country.<br><br>Because <b>Kyusa Level starts with me.</b></div></div>`,qr:['🎵 Play the anthem','Customer Obsession quiz','Back to menu']}
+  ],
+
+  anthem:[
+    {bot:`<div style="text-align:center;padding:6px 0">🎵 <b>Now playing:</b> "Kyusa Level" — inspired by Nikolela Mali 🎵<br><br><div class="pb" style="margin:8px 0"><div class="pf" style="width:40%"></div></div><i>"...because Kyusa Level starts with me..."</i><br><br>Get the full track on the internal portal — perfect for team huddles!</div>`,qr:['Customer Obsession quiz','Back to menu']}
   ],
 
   progress:[
@@ -438,11 +469,22 @@ function renderChat(){
   if(currentBranch){
     const branch=branches[currentBranch];
     if(branch){
+      while(!branch[branchStep].qr&&branchStep<branch.length-1){
+        const skipped=branch[branchStep];
+        const skey=currentBranch+':'+branchStep;
+        if(skipped.earn&&!awardedSteps.has(skey)){awardedSteps.add(skey);awardPoints(skipped.earn.pts,skipped.earn.msg,skipped.earn.color,skipped.earn.ace);}
+        branchStep++;
+      }
+      const ckey=currentBranch+':'+branchStep;
+      const cur=branch[branchStep];
+      if(cur.earn&&!awardedSteps.has(ckey)){awardedSteps.add(ckey);awardPoints(cur.earn.pts,cur.earn.msg,cur.earn.color,cur.earn.ace);}
       for(let i=0;i<=branchStep&&i<branch.length;i++){
         const s=branch[i];
         if(s.user){const u=document.createElement('div');u.className='bubble user';u.innerHTML=s.user+`<div class="bts">${ts}</div>`;body.appendChild(u);}
-        const bd=document.createElement('div');bd.className='bubble bot';
-        bd.innerHTML=s.bot+`<div class="bts">${ts}</div>`;body.appendChild(bd);
+        if(s.bot){
+          const bd=document.createElement('div');bd.className='bubble bot';
+          bd.innerHTML=s.bot+`<div class="bts">${ts}</div>`;body.appendChild(bd);
+        }
         if(i===branchStep&&s.qr)setQRs(s.qr);
         else if(i===branchStep&&!s.qr)setQRs(['Back to menu']);
       }
@@ -459,7 +501,7 @@ function setQRs(list){
   });
 }
 
-const shortcuts={'Customer Obsession quiz':'quiz','Leadership Academy':'leadAcademy','The Employee Pledge':'pledge','Maali by business need':'maaliNeed','Continue learning':'serf','Redeem points':'rewardsChat'};
+const shortcuts={'Customer Obsession quiz':'quiz','Leadership Academy':'leadAcademy','The Employee Pledge':'pledge','Maali by business need':'maaliNeed','Continue learning':'serf','Redeem points':'rewardsChat','Try a SPOT challenge':'serfChallenge','Builders (Micro)':'maaliBuilders','Dreamers (Small)':'maaliDreamers','Climbers (Medium)':'maaliClimbers','Anchors (Large)':'maaliAnchors','Our 4 Behaviours':'leadBehaviours','Our Campaign Pillars':'leadPillars','🎵 Play the anthem':'anthem'};
 
 function handleQR(label){
   const md=flows[currentMode];
@@ -468,12 +510,11 @@ function handleQR(label){
   if(sc){currentBranch=sc;branchStep=0;renderChat();return;}
   if(!currentBranch){
     const key=md.branches&&md.branches[label];
-    if(key){currentBranch=key;branchStep=0;const b=branches[key];if(b&&b[0]&&b[0].earn)awardPoints(b[0].earn.pts,b[0].earn.msg,b[0].earn.color,b[0].earn.ace);renderChat();return;}
+    if(key){currentBranch=key;branchStep=0;renderChat();return;}
   } else {
     const branch=branches[currentBranch];
     if(branch&&branchStep<branch.length-1){
-      branchStep++;const s=branch[branchStep];
-      if(s&&s.earn)setTimeout(()=>awardPoints(s.earn.pts,s.earn.msg,s.earn.color,s.earn.ace),300);
+      branchStep++;
       renderChat();return;
     }
     const nextKey=md.branches&&md.branches[label];
@@ -490,11 +531,11 @@ function awardPoints(amount,msg,color,ace){
 const keywordMap={
   staff:[
     [['kyusa level','what is kyusa','kyusa'],'kyusa'],
-    [['serf','spot','engage','recommend','follow up','way of working'],'serf'],
-    [['maali','business need','current account','maali plus','maali bundled','products'],'maaliNeed'],
+    [['serf','spot','engage','recommend','follow up','way of working','challenge'],'serf'],
+    [['maali','business need','current account','maali plus','maali bundled','products','builders','dreamers','climbers','anchors','segment'],'maaliNeed'],
     [['quiz','obsession','test my'],'quiz'],
-    [['leadership','academy','leading the dfcu way','behaviours','behaviors'],'leadAcademy'],
-    [['pledge'],'pledge'],
+    [['leadership','academy','leading the dfcu way','behaviours','behaviors','pillars'],'leadAcademy'],
+    [['pledge','anthem','song','nikolela'],'pledge'],
     [['progress','my progress'],'progress'],
     [['reward','redeem','points','rewards store'],'rewardsChat']
   ],
